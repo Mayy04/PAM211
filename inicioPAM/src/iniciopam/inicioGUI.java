@@ -37,5 +37,35 @@ public class inicioGUI extends JFrame{
        
        add(panelBotones, BorderLayout.CENTER);
 
+       reglamentoPOO.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+           new reglamentoPOO();    
+           }
+       });
+       
+       lineamientosClassroom.addActionListener(new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e) {
+           new lineamientosClassroom();    
+           }
+           
+       });
+       
+       fechasDeParciales.addActionListener(new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e) {
+           new fechasDeParciales();  
+           } 
+       });
+       
+       porcentajesPorParcial.addActionListener(new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e) {
+           new porcentajesPorParcial();    
+           }
+           
+       });
+               
    }
 }
