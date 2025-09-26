@@ -21,3 +21,4 @@ const sumaedades = personas.reduce((result, personas) => result + personas.edad,
 /*constante sumaedades = acceder a personas.reduce(nueva var resultado, var personas) asigna a resultado
 + acceder a personas edad*/
 console.log(sumaedades);
+

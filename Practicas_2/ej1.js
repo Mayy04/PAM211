@@ -3,7 +3,7 @@ const persona = {
     edad: 37,
     direccion:{
         ciudad:"Qro",
-        pais: "MX"
+         pais: "MX"
     }
 };
 
