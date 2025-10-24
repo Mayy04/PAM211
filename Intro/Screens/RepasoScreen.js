@@ -18,21 +18,20 @@ export default function RepasoScreen() {
       } else {
         Alert.alert('Registro realizado con éxito, nombre: '+ nombre, 'correo: '+ correo);
       }
-    } else if (nombre.trim() === '') {
-      Platform.OS === 'web' ? window.alert('Error, ingresa nombre') : Alert.alert('Error, ingresa nombre');
-    } else if (correo.trim() === '') {
-      Platform.OS === 'web' ? window.alert('Error, ingresa correo') : Alert.alert('Error, ingresa correo');
-    } else if (!terminos) {
-      Platform.OS === 'web' ? window.alert('Error, debes aceptar términos y condiciones') : Alert.alert('Error, debes aceptar términos y condiciones');
-      if (!regexCorreo.test(correo)){
-    if (Platform.OS === 'web') {
-        window.alert('Error, correo incorrecto');
-      } else {
-        Alert.alert('Error, correo incorrecto');
-      }
-  }
     }
-    
+    if (nombre.trim() === '') {
+      Platform.OS === 'web' ? window.alert('Error, ingresa nombre') : Alert.alert('Error, ingresa nombre');
+    } 
+    if (correo.trim() === '') {
+      Platform.OS === 'web' ? window.alert('Error, ingresa correo') : Alert.alert('Error, ingresa correo');
+    }
+    if (!terminos) {
+      Platform.OS === 'web' ? window.alert('Error, debes aceptar términos y condiciones') : Alert.alert('Error, debes aceptar términos y condiciones');
+    }
+    if (!regexCorreo.test(correo)){
+    Platform.OS === 'web' ? window.alert('Error, correo incorrecto') : Alert.alert('Error, correo incorrecto');
+  }
+     
   
   }
 
