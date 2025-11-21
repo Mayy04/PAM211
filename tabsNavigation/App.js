@@ -49,7 +49,7 @@ export default function App(){
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Tabs" component={Tabs} options={{headerShown:false}}/>
+        <Stack.Screen name="Tabs" component={Tabs}/>
         <Stack.Screen name='detalle' component={Detalles}/>
       </Stack.Navigator>
 
