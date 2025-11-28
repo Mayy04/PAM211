@@ -1,7 +1,8 @@
 import { useEffect,useState, useCallback, use } from "react";
 import {View, Text, TextInput, TouchableOpacity, FlatList,
-    StyleSheet, Alert, ActivityIndicator, Platform
+    StyleSheet, Alert, ActivityIndicator, Platform, ScrollView, Modal
 } from 'react-native'
+import {MaterialIcons} from '@expo/vector-icons'
 import { UsuarioController } from "../controllers/UsuarioController";
 
 const controller = new UsuarioController()
@@ -11,6 +12,10 @@ export default function UsuarioView(){
         const [nombre, setNombre]=useState('');
         const [loading, setLoading]=useState(true);
         const [guardando, setGuardando] = useState(false);
+
+        const [modalVisible, setModalVisible]=useState(false);
+        const [usuarioEditado, setUsuarioEditado]=useState(null);
+        const [nuevoNombre, setNuevoNombre]=useState('');
 
         const cargarUsuarios = useCallback(async()=>{
             try{
@@ -29,6 +34,7 @@ export default function UsuarioView(){
             const init = async()=>{
                 await controller.initialize();
                 await cargarUsuarios();
+                
             };
             init();
             controller.addListener(cargarUsuarios);
@@ -54,6 +60,53 @@ export default function UsuarioView(){
             }
         };
 
+        const handleEditar=(usuario)=>{
+            setUsuarioEditado(usuario);
+            setNuevoNombre(usuario.nombre);
+            setModalVisible(true);
+        }
+
+        const guardar=async()=>{
+            if(!nuevoNombre.trim()){
+                Alert.alert("Error", "El nombre no debe estar vacío");
+                return;
+            }
+            try{
+                setGuardando(true);
+                await controller.actualizarUsuario(usuarioEditado.id, nuevoNombre);
+                Alert.alert("Usuario actualizado correctamente");
+                setModalVisible(false);
+                setUsuarioEditado(null);
+                setNuevoNombre('');
+            }catch(error){
+                Alert.alert("Error", error.message);
+            }finally{
+                setGuardando(false);
+            }
+        };
+
+       const handleEliminar = (usuario) => {
+            Alert.alert(
+            "Eliminar usuario",
+            "Quieres eliminar este usuario?",
+            [
+                { text: "Cancelar", style: "cancel" },
+                {
+                    text: "Eliminar",
+                    style: "delete",
+                    onPress: async () => {
+                        try {
+                            await controller.eliminarUsuario(usuario.id);
+                            Alert.alert("Usuario eliminado");
+                        } catch (error) {
+                        Alert.alert("Error", error.message);
+                    }
+                }
+            }
+        ]
+    );
+};
+
         const renderUsuario = ({item, index})=>(
             <View style={styles.userItem}>
                 <View style={styles.userNumber}>
@@ -70,6 +123,12 @@ export default function UsuarioView(){
                         })}
                     </Text>
                 </View>
+                <TouchableOpacity onPress={()=>handleEditar(item)}>
+                    <MaterialIcons name="edit" size={29} color="#555"/>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={()=>handleEliminar(item)}>
+                    <MaterialIcons name="delete-outline" size={29} color="#555"/>
+                </TouchableOpacity>
             </View>
         );
         
@@ -102,12 +161,32 @@ export default function UsuarioView(){
                         <ActivityIndicator size="large" color="#007bff"/>
                     ) : (
                         <FlatList
+                        style={{maxHeight:300}}
                         data={usuarios}
                         keyExtractor={(item)=>item.id.toString()}
                         renderItem={renderUsuario}
                         />
                     )}
                 </View>
+                <Modal transparent={true} visible={modalVisible} animationType="slide">
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Editar Usuario</Text>
+                            <TextInput
+                            style={styles.input}
+                            value={nuevoNombre}
+                            onChangeText={setNuevoNombre}/>
+                            <View style={styles.modalButton}>
+                                <TouchableOpacity style={styles.button} onPress={guardar}>
+                                    <Text style={styles.textButton}>Guardar</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.button} onPress={()=>setModalVisible(false)}>
+                                    <Text style={styles.textButton}>Cancelar</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
             </View>
         )
     }
@@ -123,7 +202,7 @@ export default function UsuarioView(){
             fontSize:22,
             fontWeight:"bold",
             textAlign:"center",
-            marginTop:10,
+            marginTop:50,
             color:"#000",
         },
         subtitle:{
@@ -204,5 +283,28 @@ export default function UsuarioView(){
             fontSize:13,
             color:"#777",
             marginTop:2,
+        },
+        modalOverlay: {
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            justifyContent: "center",
+            alignItems: "center",
+        },
+        modalContent: {
+            backgroundColor: "#fff",
+            padding: 20,
+            borderRadius: 10,
+            width: "85%",
+        },
+        modalTitle: {
+            fontSize: 20,
+            fontWeight: "bold",
+            textAlign: "center",
+            marginBottom: 15,
+        },
+        modalButton: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: 10,
         }
     })

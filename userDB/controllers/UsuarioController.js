@@ -26,7 +26,7 @@ export class UsuarioController{
 
             const nuevoUsuario = await DatabaseService.add(nombre.trim());
 
-            this.notifyListener();
+            this.notifyListeners();
 
             return new Usuario(
                 nuevoUsuario.id,
@@ -39,12 +39,33 @@ export class UsuarioController{
         }
     }
 
+    async actualizarUsuario(id,nombre){
+        try{
+            Usuario.validar(nombre);
+            const usuarioActualizado = await DatabaseService.update(id,nombre.trim());
+            this.notifyListeners();
+            return usuarioActualizado;
+        }catch(error){
+            console.error('Errro al actualizar el usuario', error);
+            throw error;
+        }
+    }
+    async eliminarUsuario(id){
+        try{
+            await DatabaseService.delete(id);
+            this.notifyListeners();
+        }catch (error){
+            console.error('Error al eliminar al usuario', error);
+            throw error;
+        }
+    }
+
     addListener(callback){
         this.listeners.push(callback);
     }
 
     removeListener(callback){
-        this.listeners=this.listeners.filter(l=l!==callback);
+        this.listeners = this.listeners.filter(l => l !== callback);
     }
     notifyListeners(){
         this.listeners.forEach(callback=>callback());

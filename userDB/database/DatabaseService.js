@@ -14,12 +14,12 @@ async initialize(){
         console.log('Usando LocalStorage para web')
     }else{
         console.log('Usando SQLite para móvil')
-        this.db=await SQLite.openDatabaseAsync('myapp.db');
+        this.db=await SQLite.openDatabaseAsync('miapp.db');
         await this.db.execAsync(`
-            CREATE TABLE IF NOT EXIST usuarios(
+            CREATE TABLE IF NOT EXISTS usuarios(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nombre TEXT NOT NULL,
-                fecha_creacion DATETAME DEFAULT CURRENT_TIMESTAMP
+                fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
             );
         `);
     }
@@ -60,6 +60,46 @@ async add(nombre){
         };
     }
 }
+
+async update(id,nombre){
+    if(Platform.OS==='web'){
+        const usuarios=await this.getAll();
+        const d=usuarios.findIndex(u=>u.id===id);
+        
+        if(d !== -1){
+            usuarios[d].nombre=nombre;
+            localStorage.setItem(this.storageKey, JSON.stringify(usuarios));
+            return usuarios[d];
+        }
+        return null;
+    }else{
+        await this.db.runAsync(
+            "UPDATE usuarios SET nombre = ?",
+            [nombre, id]
+        );
+        return{
+            id,
+            nombre,
+            fecha_creacion: new Date().toISOString()
+        }
+    }
+}
+
+async delete(id){
+    if(Platform.OS==='web'){
+        const usuarios =await this.getAll();
+        const d =usuarios.filter(u=> u.id !==id);
+        localStorage.setItem(this.storageKey, JSON.stringify(d));
+        return true;
+    }else{
+        await this.db.runAsync(
+            "DELETE FROM usuarios WHERE id=?",
+            [id]
+        );
+        return true;
+    }
+}
+
 }
 
 export default new DatabaseService();
